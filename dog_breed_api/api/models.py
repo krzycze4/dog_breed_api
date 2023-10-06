@@ -31,7 +31,7 @@ class Breed(models.Model):
 class Dog(models.Model):
     name = models.CharField(max_length=20)
     age = models.PositiveIntegerField()
-    breed = models.ForeignKey(Breed, on_delete=models.SET_NULL)
+    breed = models.ForeignKey(Breed, on_delete=models.SET_NULL, null=True)
     friendliness = models.PositiveIntegerField(
         default=1, validators=[MinValueValidator(1), MaxValueValidator(5)]
     )

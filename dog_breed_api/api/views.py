@@ -32,3 +32,19 @@ class DogDetail(APIView):
         dog = self.get_object(pk=pk)
         dog.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DogList(APIView):
+    def get(self, request):
+        dogs = Dog.objects.all()
+        if dogs:
+            serializer = DogSerializer(dogs, many=True)
+            return Response(serializer.data)
+        return Http404
+
+    def post(self, request):
+        serializer = DogSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

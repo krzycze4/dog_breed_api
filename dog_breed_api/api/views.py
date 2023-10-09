@@ -1,8 +1,8 @@
 from django.http import Http404
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Dog
-from .serializers import DogSerializer
+from .models import Dog, Breed
+from .serializers import DogSerializer, BreedSerializer
 from rest_framework.views import APIView
 
 
@@ -48,3 +48,47 @@ class DogList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BreedDetail(APIView):
+    def get_object(self, pk):
+        try:
+            breed = Breed.objects.get(id=pk)
+        except Breed.DoesNotExist:
+            return Http404
+        else:
+            return breed
+
+    def get(self, request, pk):
+        breed = self.get_object(pk=pk)
+        serializer = BreedSerializer(breed)
+        return Response(data=serializer.data)
+
+    def put(self, request, pk):
+        serializer = BreedSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        breed = self.get_object(pk=pk)
+        breed.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class BreedList(APIView):
+    def get(self, request):
+        breeds = Breed.objects.all()
+        if breeds:
+            serializer = BreedSerializer(breeds, many=True)
+            return Response(serializer.data)
+        return Response(breeds.errors, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        serializer = BreedSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)

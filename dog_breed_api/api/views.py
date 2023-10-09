@@ -20,7 +20,7 @@ class DogDetail(APIView):
         serializer = DogSerializer(dog)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+    def put(self, request, pk):
         dog = self.get_object(pk=pk)
         serializer = DogSerializer(dog, data=request.data)
         if serializer.is_valid():
